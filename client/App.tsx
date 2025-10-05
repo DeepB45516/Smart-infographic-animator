@@ -39,6 +39,7 @@ import TextToChart from "./pages/TextToChart";
 import AnimateChart from "./pages/AnimateChart";
 import TextToUML from "./pages/TextToUML";
 import TextToERDiagram from "./pages/TextToERDiagram";
+import AutoDashboard from "./pages/AutoDashboard";
 import NotFound from "./pages/NotFound";
 
 // ✅ Import ChatBot
@@ -62,6 +63,7 @@ const App = () => (
             <Route path="/animate-chart" element={<AnimateChart />} />
             <Route path="/text-to-uml" element={<TextToUML />} />
             <Route path="/text-to-er-diagram" element={<TextToERDiagram />} />
+            <Route path="/auto-dashboard" element={<AutoDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

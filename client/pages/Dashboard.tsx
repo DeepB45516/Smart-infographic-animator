@@ -1,50 +1,24 @@
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Plus, BarChart3, FileText, Settings, User, LogOut, GitBranch, Database } from "lucide-react";
-import { useStats } from "@/hooks/use-stats";
-import { useAuth } from "@/contexts/AuthContext";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
-import { useEffect } from "react";
+import { useState } from "react";
+import { ArrowLeft, Plus, BarChart3, FileText, Settings, User, LogOut, GitBranch, Database, Layout } from "lucide-react";
 
 export default function Dashboard() {
-  const { trackInfographic } = useStats();
-  const { user, logout, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const [user] = useState({
+    name: "John Doe",
+    email: "john.doe@example.com",
+    picture: null
+  });
 
-  // Redirect if not authenticated - moved to useEffect to avoid setState during render
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
-
-  // Return loading or null while redirecting
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  const handleCreateNew = async () => {
-    if (!user) return;
-
-    const title = `New Infographic ${new Date().toLocaleDateString()}`;
-    await trackInfographic(user.id, title);
-    toast.success("New infographic project created!");
+  const handleCreateNew = () => {
+    alert("New infographic project created!");
   };
 
   const handleLogout = () => {
-    logout();
-    toast.success("Successfully logged out");
-    navigate("/");
+    alert("Successfully logged out");
+  };
+
+  const handleNavigation = (path) => {
+    // Navigate to the actual page/route
+    window.location.href = path;
   };
 
   return (
@@ -54,63 +28,32 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link to="/" className="flex items-center space-x-2 text-slate-600 hover:text-slate-800 transition-colors">
+              <button 
+                onClick={() => handleNavigation("/")}
+                className="flex items-center space-x-2 text-slate-600 hover:text-slate-800 transition-colors"
+              >
                 <ArrowLeft className="h-5 w-5" />
                 <span>Back to Home</span>
-              </Link>
+              </button>
               <div className="h-6 w-px bg-slate-300"></div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Dashboard
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/settings">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </Link>
-              </Button>
+              <button 
+                onClick={() => handleNavigation("/settings")}
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 h-9 px-3"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </button>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.picture} alt={user?.name || "User"} />
-                      <AvatarFallback>
-                        {user?.name?.charAt(0).toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user?.name}</p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/settings" className="flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/settings" className="flex items-center">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="relative">
+                <button className="relative h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-300">
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -144,15 +87,18 @@ export default function Dashboard() {
               <h3 className="text-3xl font-bold text-slate-800 mb-2">Chart Creation Tools</h3>
               <p className="text-slate-600">Choose your preferred method to create stunning infographics</p>
             </div>
-            <Button variant="outline" size="sm" className="hidden md:flex">
+            <button className="hidden md:flex items-center justify-center rounded-md text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 h-9 px-3">
               View All Features
-            </Button>
+            </button>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
-            <Link to="/file-to-chart">
-              <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transform hover:scale-105">
-                <CardContent className="p-8 text-center">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <button
+              onClick={() => handleNavigation("/file-to-chart")}
+              className="text-left w-full"
+            >
+              <div className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transform hover:scale-105 rounded-lg">
+                <div className="p-8 text-center">
                   <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-blue-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
                     <FileText className="h-10 w-10 text-white" />
                   </div>
@@ -161,13 +107,16 @@ export default function Dashboard() {
                   <div className="flex items-center justify-center text-sm text-blue-600 font-medium">
                     Get Started <ArrowLeft className="h-4 w-4 ml-1 rotate-180" />
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
+                </div>
+              </div>
+            </button>
 
-            <Link to="/text-to-chart">
-              <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transform hover:scale-105">
-                <CardContent className="p-8 text-center">
+            <button
+              onClick={() => handleNavigation("/text-to-chart")}
+              className="text-left w-full"
+            >
+              <div className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transform hover:scale-105 rounded-lg">
+                <div className="p-8 text-center">
                   <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
                     <BarChart3 className="h-10 w-10 text-white" />
                   </div>
@@ -176,13 +125,16 @@ export default function Dashboard() {
                   <div className="flex items-center justify-center text-sm text-purple-600 font-medium">
                     Try AI Magic <ArrowLeft className="h-4 w-4 ml-1 rotate-180" />
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
+                </div>
+              </div>
+            </button>
 
-            <Link to="/animate-chart">
-              <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transform hover:scale-105">
-                <CardContent className="p-8 text-center">
+            <button
+              onClick={() => handleNavigation("/animate-chart")}
+              className="text-left w-full"
+            >
+              <div className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transform hover:scale-105 rounded-lg">
+                <div className="p-8 text-center">
                   <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
                     <Plus className="h-10 w-10 text-white animate-pulse" />
                   </div>
@@ -191,13 +143,16 @@ export default function Dashboard() {
                   <div className="flex items-center justify-center text-sm text-orange-600 font-medium">
                     Add Motion <ArrowLeft className="h-4 w-4 ml-1 rotate-180" />
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
+                </div>
+              </div>
+            </button>
 
-            <Link to="/text-to-uml">
-              <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transform hover:scale-105">
-                <CardContent className="p-8 text-center">
+            <button
+              onClick={() => handleNavigation("/text-to-uml")}
+              className="text-left w-full"
+            >
+              <div className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transform hover:scale-105 rounded-lg">
+                <div className="p-8 text-center">
                   <div className="w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
                     <GitBranch className="h-10 w-10 text-white" />
                   </div>
@@ -206,13 +161,16 @@ export default function Dashboard() {
                   <div className="flex items-center justify-center text-sm text-cyan-600 font-medium">
                     Generate UML <ArrowLeft className="h-4 w-4 ml-1 rotate-180" />
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
+                </div>
+              </div>
+            </button>
 
-            <Link to="/text-to-er-diagram">
-              <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transform hover:scale-105">
-                <CardContent className="p-8 text-center">
+            <button
+              onClick={() => handleNavigation("/text-to-er-diagram")}
+              className="text-left w-full"
+            >
+              <div className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transform hover:scale-105 rounded-lg">
+                <div className="p-8 text-center">
                   <div className="w-20 h-20 bg-gradient-to-r from-teal-500 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
                     <Database className="h-10 w-10 text-white" />
                   </div>
@@ -221,9 +179,27 @@ export default function Dashboard() {
                   <div className="flex items-center justify-center text-sm text-teal-600 font-medium">
                     Design Database <ArrowLeft className="h-4 w-4 ml-1 rotate-180" />
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => handleNavigation("/auto-dashboard")}
+              className="text-left w-full"
+            >
+              <div className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transform hover:scale-105 rounded-lg">
+                <div className="p-8 text-center">
+                  <div className="w-20 h-20 bg-gradient-to-r from-indigo-500 to-violet-600 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
+                    <Layout className="h-10 w-10 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-800 mb-3">Auto Dashboard</h3>
+                  <p className="text-slate-600 mb-4">Automatically generate comprehensive dashboards from your data</p>
+                  <div className="flex items-center justify-center text-sm text-indigo-600 font-medium">
+                    Create Dashboard <ArrowLeft className="h-4 w-4 ml-1 rotate-180" />
+                  </div>
+                </div>
+              </div>
+            </button>
           </div>
         </div>
 
@@ -243,89 +219,89 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="grid md:grid-cols-4 gap-4">
-            <Card
-              className="cursor-pointer hover:shadow-lg transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm"
+            <div
+              className="cursor-pointer hover:shadow-lg transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm rounded-lg"
               onClick={handleCreateNew}
             >
-              <CardContent className="p-4 text-center">
+              <div className="p-4 text-center">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <Plus className="h-6 w-6 text-white" />
                 </div>
                 <h4 className="font-semibold text-slate-800 mb-1">Create New</h4>
                 <p className="text-xs text-slate-600">Start from scratch</p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm">
-              <CardContent className="p-4 text-center">
+            <div className="cursor-pointer hover:shadow-lg transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm rounded-lg">
+              <div className="p-4 text-center">
                 <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <FileText className="h-6 w-6 text-white" />
                 </div>
                 <h4 className="font-semibold text-slate-800 mb-1">Templates</h4>
                 <p className="text-xs text-slate-600">Browse designs</p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm">
-              <CardContent className="p-4 text-center">
+            <div className="cursor-pointer hover:shadow-lg transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm rounded-lg">
+              <div className="p-4 text-center">
                 <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <BarChart3 className="h-6 w-6 text-white" />
                 </div>
                 <h4 className="font-semibold text-slate-800 mb-1">Analytics</h4>
                 <p className="text-xs text-slate-600">View insights</p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm" asChild>
-              <Link to="/settings">
-                <CardContent className="p-4 text-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <Settings className="h-6 w-6 text-white" />
-                  </div>
-                  <h4 className="font-semibold text-slate-800 mb-1">Settings</h4>
-                  <p className="text-xs text-slate-600">Preferences</p>
-                </CardContent>
-              </Link>
-            </Card>
+            <button
+              onClick={() => handleNavigation("/settings")}
+              className="cursor-pointer hover:shadow-lg transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm rounded-lg w-full"
+            >
+              <div className="p-4 text-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Settings className="h-6 w-6 text-white" />
+                </div>
+                <h4 className="font-semibold text-slate-800 mb-1">Settings</h4>
+                <p className="text-xs text-slate-600">Preferences</p>
+              </div>
+            </button>
           </div>
         </div>
 
         {/* Recent Projects and Stats Grid */}
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <Card className="border-0 bg-white/60 backdrop-blur-sm">
-              <CardHeader>
-                <div className="flex items-center justify-between">
+            <div className="border-0 bg-white/60 backdrop-blur-sm rounded-lg">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
                   <div>
-                    <CardTitle className="text-xl font-bold text-slate-800">Recent Projects</CardTitle>
-                    <CardDescription>Your latest infographic creations</CardDescription>
+                    <h3 className="text-xl font-bold text-slate-800">Recent Projects</h3>
+                    <p className="text-sm text-slate-600">Your latest infographic creations</p>
                   </div>
-                  <Button variant="outline" size="sm">View All</Button>
+                  <button className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 h-9 px-3">
+                    View All
+                  </button>
                 </div>
-              </CardHeader>
-              <CardContent>
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gradient-to-r from-slate-200 to-slate-300 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <FileText className="h-8 w-8 text-slate-500" />
                   </div>
                   <h3 className="text-lg font-semibold text-slate-600 mb-2">No projects yet</h3>
                   <p className="text-slate-500 mb-4">Get started by creating your first infographic</p>
-                  <Button
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  <button
+                    className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-9 px-3"
                     onClick={handleCreateNew}
-                    size="sm"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Create First Project
-                  </Button>
+                  </button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-4">
-            <Card className="border-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-              <CardContent className="p-6">
+            <div className="border-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg">
+              <div className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-3xl font-bold">0</div>
@@ -333,11 +309,11 @@ export default function Dashboard() {
                   </div>
                   <BarChart3 className="h-8 w-8 text-blue-200" />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card className="border-0 bg-gradient-to-r from-green-500 to-blue-500 text-white">
-              <CardContent className="p-6">
+            <div className="border-0 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg">
+              <div className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-3xl font-bold">0</div>
@@ -345,11 +321,11 @@ export default function Dashboard() {
                   </div>
                   <FileText className="h-8 w-8 text-green-200" />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card className="border-0 bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-              <CardContent className="p-6">
+            <div className="border-0 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg">
+              <div className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-3xl font-bold">0</div>
@@ -357,42 +333,54 @@ export default function Dashboard() {
                   </div>
                   <Plus className="h-8 w-8 text-purple-200" />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Getting Started Tips */}
         <div className="mt-8">
-          <Card className="border-0 bg-gradient-to-r from-slate-50 to-blue-50">
-            <CardContent className="p-6">
+          <div className="border-0 bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg">
+            <div className="p-6">
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
                   <User className="h-6 w-6 text-white" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-slate-800 mb-2">Welcome to Your Dashboard!</h3>
                   <p className="text-slate-600 mb-4">
-                    Start by exploring our five powerful chart creation tools above. Each tool is designed to help you create professional infographics quickly and easily.
+                    Start by exploring our six powerful chart creation tools above. Each tool is designed to help you create professional infographics quickly and easily.
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to="/file-to-chart">Try File Upload</Link>
-                    </Button>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to="/text-to-chart">Try AI Generation</Link>
-                    </Button>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to="/animate-chart">Try Animations</Link>
-                    </Button>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to="/text-to-er-diagram">Try ER Diagrams</Link>
-                    </Button>
+                    <button 
+                      onClick={() => handleNavigation("/file-to-chart")}
+                      className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 h-9 px-3"
+                    >
+                      Try File Upload
+                    </button>
+                    <button 
+                      onClick={() => handleNavigation("/text-to-chart")}
+                      className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 h-9 px-3"
+                    >
+                      Try AI Generation
+                    </button>
+                    <button 
+                      onClick={() => handleNavigation("/animate-chart")}
+                      className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 h-9 px-3"
+                    >
+                      Try Animations
+                    </button>
+                    <button 
+                      onClick={() => handleNavigation("/auto-dashboard")}
+                      className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 h-9 px-3"
+                    >
+                      Try Auto Dashboard
+                    </button>
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
