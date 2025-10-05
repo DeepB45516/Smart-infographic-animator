@@ -1,5 +1,4 @@
 { pkgs, ... }:
-
 {
   # Use the unstable channel for latest packages
   channel = "unstable";
@@ -19,15 +18,8 @@
     enable = true;
     previews = {
       web = {
-        # Use Firebase CLI preview instead of npm dev
-        command = [
-          "firebase"
-          "emulators:start"
-          "--only"
-          "hosting"
-          "--port"
-          "$PORT"
-        ];
+        # Use npm run dev to start the dev server
+        command = ["npm", "run", "dev", "--", "--port", "$PORT"];
         manager = "web";
       };
     };
