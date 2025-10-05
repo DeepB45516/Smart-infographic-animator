@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { googleAuth } from '@/lib/google-auth';
 import { AuthResponse, GoogleLoginRequest } from '@shared/auth';
 import { Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface GoogleLoginButtonProps {
   onSuccess?: () => void;
@@ -21,6 +22,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
   const [isDevelopmentMode, setIsDevelopmentMode] = useState(false);
   const buttonRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const initializeGoogle = async () => {
@@ -74,37 +76,8 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
     }
   };
 
-  const handleDevelopmentLogin = async () => {
-    setIsLoading(true);
-
-    try {
-      const mockToken = await googleAuth.signInWithPopup();
-      const loginRequest: GoogleLoginRequest = {
-        idToken: mockToken,
-      };
-
-      const apiResponse = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginRequest),
-      });
-
-      const data: AuthResponse = await apiResponse.json();
-
-      if (data.success && data.data) {
-        login(data.data);
-        onSuccess?.();
-      } else {
-        onError?.(data.error || 'Development login failed');
-      }
-    } catch (error) {
-      console.error('Development login error:', error);
-      onError?.('Development login failed');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleDevelopmentLogin = () => {
+    navigate('/dashboard');
   };
 
   useEffect(() => {
