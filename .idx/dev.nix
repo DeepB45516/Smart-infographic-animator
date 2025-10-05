@@ -6,7 +6,7 @@
 
   # Add required packages
   packages = [
-    pkgs.nodejs_21
+    pkgs.nodejs_20
     pkgs.firebase-tools
   ];
 
@@ -35,4 +35,3 @@
     };
   };
 }
-
