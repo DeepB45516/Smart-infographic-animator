@@ -1,33 +1,34 @@
 { pkgs, ... }:
 
 {
-  # Which nixpkgs channel to use.
-  channel = "unstable"; # or "stable-23.11"
+  # Which nixpkgs channel to use
+  channel = "unstable";
 
-  # Use https://search.nixos.org/packages to find packages
+  # Include necessary packages
   packages = [
     pkgs.nodejs_21
+    pkgs.firebase-tools
   ];
 
-  # Sets environment variables in the workspace
+  # Set environment variables (optional)
   env = {
+    FIREBASE_EMULATOR_PORT = "5000";
   };
 
-  # Enable previews and customize configuration
+  # Enable IDX previews and configure Firebase preview
   idx.previews = {
     enable = true;
     previews = {
-      # The following object sets web previews
-      web = {
+      firebase = {
         command = [
-          "npm",
-          "run",
-          "dev",
-          "--",
-          "--port",
-          "$PORT",
-          "--host",
+          "firebase"
+          "emulators:start"
+          "--only"
+          "hosting"
+          "--host"
           "0.0.0.0"
+          "--port"
+          "$PORT"
         ];
         manager = "web";
       };
